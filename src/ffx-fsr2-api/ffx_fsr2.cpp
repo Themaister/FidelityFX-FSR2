@@ -475,7 +475,7 @@ static FfxErrorCode fsr2Release(FfxFsr2Context_Private* context)
     return FFX_OK;
 }
 
-static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2DispatchDescription* params, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
+static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2DispatchDescription*, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxComputeJobDescription jobDescriptor = {};
 
@@ -562,8 +562,8 @@ static FfxErrorCode fsr2Dispatch(FfxFsr2Context_Private* context, const FfxFsr2D
 
     // Prepare per frame descriptor tables
     const bool isOddFrame = !!(context->resourceFrameIndex & 1);
-    const uint32_t currentCpuOnlyTableBase = isOddFrame ? FFX_FSR2_RESOURCE_IDENTIFIER_COUNT : 0;
-    const uint32_t currentGpuTableBase = 2 * FFX_FSR2_RESOURCE_IDENTIFIER_COUNT * context->resourceFrameIndex;
+    //const uint32_t currentCpuOnlyTableBase = isOddFrame ? FFX_FSR2_RESOURCE_IDENTIFIER_COUNT : 0;
+    //const uint32_t currentGpuTableBase = 2 * FFX_FSR2_RESOURCE_IDENTIFIER_COUNT * context->resourceFrameIndex;
     const uint32_t lockStatusSrvResourceIndex = isOddFrame ? FFX_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_2 : FFX_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_1;
     const uint32_t lockStatusUavResourceIndex = isOddFrame ? FFX_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_1 : FFX_FSR2_RESOURCE_IDENTIFIER_LOCK_STATUS_2;
     const uint32_t upscaledColorSrvResourceIndex = isOddFrame ? FFX_FSR2_RESOURCE_IDENTIFIER_INTERNAL_UPSCALED_COLOR_2 : FFX_FSR2_RESOURCE_IDENTIFIER_INTERNAL_UPSCALED_COLOR_1;
