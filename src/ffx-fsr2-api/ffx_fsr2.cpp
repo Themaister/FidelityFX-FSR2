@@ -183,7 +183,7 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
 {
     for (uint32_t srvIndex = 0; srvIndex < inoutPipeline->srvCount; ++srvIndex)
     {
-        int32_t mapIndex = 0;
+        size_t mapIndex = 0;
         for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
         {
             if (0 == wcscmp(srvResourceBindingTable[mapIndex].name, inoutPipeline->srvResourceBindings[srvIndex].name))
@@ -197,7 +197,7 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
 
     for (uint32_t uavIndex = 0; uavIndex < inoutPipeline->uavCount; ++uavIndex)
     {
-        int32_t mapIndex = 0;
+        size_t mapIndex = 0;
         for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
         {
             if (0 == wcscmp(uavResourceBindingTable[mapIndex].name, inoutPipeline->uavResourceBindings[uavIndex].name))
@@ -211,7 +211,7 @@ static FfxErrorCode patchResourceBindings(FfxPipelineState* inoutPipeline)
 
     for (uint32_t cbIndex = 0; cbIndex < inoutPipeline->constCount; ++cbIndex)
     {
-        int32_t mapIndex = 0;
+        size_t mapIndex = 0;
         for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
         {
             if (0 == wcscmp(cbResourceBindingTable[mapIndex].name, inoutPipeline->cbResourceBindings[cbIndex].name))
