@@ -613,7 +613,7 @@ FfxErrorCode Granite::FSR2::CreatePipeline(FfxFsr2Interface *backendInterface, F
 	auto *device = backendContext->device;
 
 	// check if we can force wave64
-	bool canForceWave64 = device->supports_subgroup_size_log2(true, 6, 6);
+	bool canForceWave64 = device->supports_subgroup_size_log2(false, 6, 6);
 	bool useLut = canForceWave64;
 
 	// check if we have 16bit floating point.
@@ -974,13 +974,7 @@ static FfxErrorCode executeRenderJobCompute(Granite::FSR2::Context *backendConte
 	if (pipeline->force_wave64)
 	{
 		cmd.enable_subgroup_size_control(true);
-		cmd.set_subgroup_size_log2(true, 6, 6);
-	}
-	else if (cmd.get_device().supports_subgroup_size_log2(true, 2, 6))
-	{
-		// Assume shaders require full subgroups.
-		cmd.enable_subgroup_size_control(true);
-		cmd.set_subgroup_size_log2(true, 2, 6);
+		cmd.set_subgroup_size_log2(false, 6, 6);
 	}
 
 	cmd.set_sampler(0, 0, Vulkan::StockSampler::NearestClamp);
