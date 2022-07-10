@@ -27,7 +27,7 @@
 #define FFX_API
 
 // Workarounds.
-#ifndef _MSC_VER
+#ifndef _WIN32
 #define _countof(array) (sizeof(array) / sizeof((array)[0]))
 #include <stdio.h>
 #include <stddef.h>
@@ -37,7 +37,9 @@ static inline void strcpy_s(char (&buf)[N], const char *str)
 {
 	snprintf(buf, N, "%s", str);
 }
+#endif
 
+#ifndef _MSC_VER
 #define FFX_STATIC static inline
 #endif
 ////
