@@ -235,9 +235,9 @@ layout (set = 0, binding = 1) uniform sampler s_LinearClamp;
 #if defined FSR2_BIND_UAV_EXPOSURE_MIP_5
 	layout (set = 1, binding = FSR2_BIND_UAV_EXPOSURE_MIP_5, r16f) coherent uniform image2D rw_img_mip_5;
 #endif
-#if defined FSR2_BIND_UAV_REACTIVE_MASK_MAX
-	layout (set = 1, binding = FSR2_BIND_UAV_REACTIVE_MASK_MAX, r8) writeonly uniform image2D rw_reactive_max;
-#endif 
+#if defined FSR2_BIND_UAV_DILATED_REACTIVE_MASKS
+	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_REACTIVE_MASKS, r8) writeonly uniform image2D rw_dilated_reactive_masks;
+#endif
 #if defined FSR2_BIND_UAV_EXPOSURE 
 	layout (set = 1, binding = FSR2_BIND_UAV_EXPOSURE, rg32f) uniform image2D rw_exposure;
 #endif 
