@@ -32,7 +32,7 @@ static const wchar_t FSR2_BIND_SRV_INPUT_COLOR[] = L"r_input_color_jittered";
 static const wchar_t FSR2_BIND_SRV_EXPOSURE[] = L"r_exposure";
 static const wchar_t FSR2_BIND_SRV_DILATED_DEPTH[] = L"r_dilatedDepth";
 static const wchar_t FSR2_BIND_SRV_DILATED_MOTION_VECTORS[] = L"r_dilated_motion_vectors";
-static const wchar_t FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"r_ReconstructedPrevNearestDepth";
+static const wchar_t FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"r_reconstructed_previous_nearest_depth";
 static const wchar_t FSR2_BIND_SRV_MOTION_VECTORS[] = L"r_motion_vectors";
 static const wchar_t FSR2_BIND_SRV_DEPTH[] = L"r_depth";
 static const wchar_t FSR2_BIND_SRV_REACTIVE_MASK[] = L"r_reactive_mask";
@@ -51,7 +51,7 @@ static const wchar_t FSR2_BIND_SRV_PRE_ALPHA_COLOR[] = L"r_input_color_pre_alpha
 static const wchar_t FSR2_BIND_SRV_POST_ALPHA_COLOR[] = L"r_input_color_post_alpha";
 
 static const wchar_t FSR2_BIND_UAV_DEPTH_CLIP[] = L"rw_depth_clip";
-static const wchar_t FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"rw_ReconstructedPrevNearestDepth";
+static const wchar_t FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"rw_reconstructed_previous_nearest_depth";
 static const wchar_t FSR2_BIND_UAV_PREPARED_INPUT_COLOR[] = L"rw_prepared_input_color";
 static const wchar_t FSR2_BIND_UAV_LUMA_HISTORY[] = L"rw_luma_history";
 static const wchar_t FSR2_BIND_UAV_DILATED_MOTION_VECTORS[] = L"rw_dilated_motion_vectors";
@@ -91,24 +91,26 @@ static const wchar_t *depth_clip_table[] = {
 static const wchar_t *reconstruct_previous_depth_table[] = {
 	FSR2_BIND_SRV_MOTION_VECTORS,
 	FSR2_BIND_SRV_DEPTH,
+	FSR2_BIND_SRV_REACTIVE_MASK,
+	FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK,
+	FSR2_BIND_SRV_PREPARED_INPUT_COLOR,
 	FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH,
 	FSR2_BIND_UAV_DILATED_MOTION_VECTORS,
 	FSR2_BIND_UAV_DILATED_DEPTH,
+	FSR2_BIND_UAV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_CB_FSR2,
 };
 
 static const wchar_t *lock_table[] = {
-	FSR2_BIND_SRV_REACTIVE_MASK,
 	FSR2_BIND_SRV_LOCK_STATUS,
 	FSR2_BIND_SRV_PREPARED_INPUT_COLOR,
 	FSR2_BIND_UAV_LOCK_STATUS,
-	FSR2_BIND_UAV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_CB_FSR2,
 };
 
 static const wchar_t *accumulate_table[] = {
 	FSR2_BIND_SRV_EXPOSURE,
-	FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK,
+	FSR2_BIND_SRV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_SRV_DILATED_MOTION_VECTORS,
 	FSR2_BIND_SRV_INTERNAL_UPSCALED,
 	FSR2_BIND_SRV_LOCK_STATUS,
@@ -117,7 +119,6 @@ static const wchar_t *accumulate_table[] = {
 	FSR2_BIND_SRV_LUMA_HISTORY,
 	FSR2_BIND_SRV_LANCZOS_LUT,
 	FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT,
-	FSR2_BIND_SRV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_SRV_EXPOSURE_MIPS,
 	FSR2_BIND_UAV_INTERNAL_UPSCALED,
 	FSR2_BIND_UAV_LOCK_STATUS,
@@ -213,8 +214,8 @@ static FfxErrorCode fsr2GetPermutationBlobByIndex(FfxFsr2Pass passId, uint32_t p
 	outBlob->defines.emplace_back(std::string("FFX_GPU"), 1);
 	outBlob->defines.emplace_back(std::string("FFX_HALF"),
 	                              (permutationOptions & Granite::FSR2::FSR2_SHADER_PERMUTATION_ALLOW_FP16) ? 1 : 0);
-	outBlob->defines.emplace_back(std::string("FFX_FSR2_OPTION_USE_LANCZOS_LUT"),
-	                              (permutationOptions & Granite::FSR2::FSR2_SHADER_PERMUTATION_LANCZOS_LUT) ? 1 : 0);
+	outBlob->defines.emplace_back(std::string("FFX_FSR2_OPTION_REPROJECT_USE_LANCZOS_TYPE"),
+	                              (permutationOptions & Granite::FSR2::FSR2_SHADER_PERMUTATION_REPROJECT_USE_LANCZOS_TYPE) ? 1 : 0);
 	outBlob->defines.emplace_back(std::string("FFX_FSR2_OPTION_HDR_COLOR_INPUT"),
 	                              (permutationOptions & Granite::FSR2::FSR2_SHADER_PERMUTATION_HDR_COLOR_INPUT) ? 1 : 0);
 	outBlob->defines.emplace_back(std::string("FFX_FSR2_OPTION_LOW_RESOLUTION_MOTION_VECTORS"),

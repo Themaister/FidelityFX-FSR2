@@ -218,7 +218,7 @@ layout (set = 0, binding = 1) uniform sampler s_LinearClamp;
 	layout (set = 1, binding = FSR2_BIND_UAV_LOCK_STATUS, r11f_g11f_b10f) uniform image2D rw_lock_status;
 #endif
 #if defined FSR2_BIND_UAV_DEPTH_CLIP
-	layout (set = 1, binding = FSR2_BIND_UAV_DEPTH_CLIP, r16f) writeonly uniform image2D rw_depth_clip;
+	layout (set = 1, binding = FSR2_BIND_UAV_DEPTH_CLIP, r8) writeonly uniform image2D rw_depth_clip;
 #endif
 #if defined FSR2_BIND_UAV_PREPARED_INPUT_COLOR
 	layout (set = 1, binding = FSR2_BIND_UAV_PREPARED_INPUT_COLOR, rgba16f) writeonly uniform image2D rw_prepared_input_color;
@@ -236,7 +236,7 @@ layout (set = 0, binding = 1) uniform sampler s_LinearClamp;
 	layout (set = 1, binding = FSR2_BIND_UAV_EXPOSURE_MIP_5, r16f) coherent uniform image2D rw_img_mip_5;
 #endif
 #if defined FSR2_BIND_UAV_DILATED_REACTIVE_MASKS
-	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_REACTIVE_MASKS, r8) writeonly uniform image2D rw_dilated_reactive_masks;
+	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_REACTIVE_MASKS, rg8) writeonly uniform image2D rw_dilated_reactive_masks;
 #endif
 #if defined FSR2_BIND_UAV_EXPOSURE 
 	layout (set = 1, binding = FSR2_BIND_UAV_EXPOSURE, rg32f) uniform image2D rw_exposure;
