@@ -30,6 +30,7 @@
 #include "shaders/ffx_spd.h"
 #include "shaders/ffx_fsr2_callbacks_hlsl.h"
 #include <cmath>
+#include <wchar.h>
 
 #include "ffx_fsr2_maximum_bias.h"
 
@@ -485,13 +486,13 @@ static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2Dispa
         const uint32_t currentResourceId = pipeline->srvResourceBindings[currentShaderResourceViewIndex].resourceIdentifier;
         const FfxResourceInternal currentResource = context->srvResources[currentResourceId];
         jobDescriptor.srvs[currentShaderResourceViewIndex] = currentResource;
-        wcscpy_s(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
     }
 
     for (uint32_t currentUnorderedAccessViewIndex = 0; currentUnorderedAccessViewIndex < pipeline->uavCount; ++currentUnorderedAccessViewIndex) {
 
         const uint32_t currentResourceId = pipeline->uavResourceBindings[currentUnorderedAccessViewIndex].resourceIdentifier;
-        wcscpy_s(jobDescriptor.uavNames[currentUnorderedAccessViewIndex], pipeline->uavResourceBindings[currentUnorderedAccessViewIndex].name);
+        wcscpy(jobDescriptor.uavNames[currentUnorderedAccessViewIndex], pipeline->uavResourceBindings[currentUnorderedAccessViewIndex].name);
 
         if (currentResourceId >= FFX_FSR2_RESOURCE_IDENTIFIER_AUTO_EXPOSURE_MIPMAP_0 && currentResourceId <= FFX_FSR2_RESOURCE_IDENTIFIER_AUTO_EXPOSURE_MIPMAP_12)
         {
@@ -513,7 +514,7 @@ static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2Dispa
     jobDescriptor.pipeline = *pipeline;
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
-        wcscpy_s( jobDescriptor.cbNames[currentRootConstantIndex], pipeline->cbResourceBindings[currentRootConstantIndex].name);
+        wcscpy( jobDescriptor.cbNames[currentRootConstantIndex], pipeline->cbResourceBindings[currentRootConstantIndex].name);
         jobDescriptor.cbs[currentRootConstantIndex] = globalFsr2ConstantBuffers[pipeline->cbResourceBindings[currentRootConstantIndex].resourceIdentifier];
     }
 
@@ -1004,9 +1005,9 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
     contextPrivate->contextDescription.callbacks.fpRegisterResource(&contextPrivate->contextDescription.callbacks, &params->colorOpaqueOnly, &jobDescriptor.srvs[0]);
     contextPrivate->contextDescription.callbacks.fpRegisterResource(&contextPrivate->contextDescription.callbacks, &params->colorPreUpscale, &jobDescriptor.srvs[1]);
     contextPrivate->contextDescription.callbacks.fpRegisterResource(&contextPrivate->contextDescription.callbacks, &params->outReactive, &jobDescriptor.uavs[0]);
-    wcscpy_s(jobDescriptor.srvNames[0], pipeline->srvResourceBindings[0].name);
-    wcscpy_s(jobDescriptor.srvNames[1], pipeline->srvResourceBindings[1].name);
-    wcscpy_s(jobDescriptor.uavNames[0], pipeline->uavResourceBindings[0].name);
+    wcscpy(jobDescriptor.srvNames[0], pipeline->srvResourceBindings[0].name);
+    wcscpy(jobDescriptor.srvNames[1], pipeline->srvResourceBindings[1].name);
+    wcscpy(jobDescriptor.uavNames[0], pipeline->uavResourceBindings[0].name);
 
     jobDescriptor.dimensions[0] = dispatchSrcX;
     jobDescriptor.dimensions[1] = dispatchSrcY;
@@ -1021,7 +1022,7 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
 
     jobDescriptor.cbs[0].uint32Size = sizeof(constants);
     memcpy(&jobDescriptor.cbs[0].data, &constants, sizeof(constants));
-    wcscpy_s(jobDescriptor.cbNames[0], pipeline->cbResourceBindings[0].name);
+    wcscpy(jobDescriptor.cbNames[0], pipeline->cbResourceBindings[0].name);
 
     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
     dispatchJob.computeJobDescriptor = jobDescriptor;
