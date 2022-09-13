@@ -265,14 +265,15 @@ static FfxErrorCode createPipelineStates(FfxFsr2Context_Private* context)
     FFX_VALIDATE(context->contextDescription.callbacks.fpCreatePipeline(&context->contextDescription.callbacks, FFX_FSR2_PASS_GENERATE_REACTIVE, &pipelineDescription, &context->pipelineGenerateReactive));
     
     // for each pipeline: re-route/fix-up IDs based on names
-    patchResourceBindings(&context->pipelinePrepareInputColor);
-    patchResourceBindings(&context->pipelineDepthClip);
-    patchResourceBindings(&context->pipelineReconstructPreviousDepth);
-    patchResourceBindings(&context->pipelineLock);
-    patchResourceBindings(&context->pipelineAccumulate);
-    patchResourceBindings(&context->pipelineComputeLuminancePyramid);
-    patchResourceBindings(&context->pipelineAccumulateSharpen);
-    patchResourceBindings(&context->pipelineRCAS);
+    FFX_VALIDATE(patchResourceBindings(&context->pipelinePrepareInputColor));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineDepthClip));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineReconstructPreviousDepth));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineLock));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineAccumulate));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineComputeLuminancePyramid));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineAccumulateSharpen));
+    FFX_VALIDATE(patchResourceBindings(&context->pipelineRCAS));
+	// maister: This cannot pass for some reason since reactive pipelines don't have r_input_pre_alpha and post_alpha? :v
     patchResourceBindings(&context->pipelineGenerateReactive);
 
     return FFX_OK;
