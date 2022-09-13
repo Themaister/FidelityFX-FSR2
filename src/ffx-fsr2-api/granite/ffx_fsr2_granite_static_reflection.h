@@ -28,50 +28,50 @@
 
 // Hardcode the reflection information.
 // Quite awkward to link this by name, but oh well ...
-static const char FSR2_BIND_SRV_INPUT_COLOR[] = "r_input_color_jittered";
-static const char FSR2_BIND_SRV_EXPOSURE[] = "r_exposure";
-static const char FSR2_BIND_SRV_DILATED_DEPTH[] = "r_dilatedDepth";
-static const char FSR2_BIND_SRV_DILATED_MOTION_VECTORS[] = "r_dilated_motion_vectors";
-static const char FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = "r_ReconstructedPrevNearestDepth";
-static const char FSR2_BIND_SRV_MOTION_VECTORS[] = "r_motion_vectors";
-static const char FSR2_BIND_SRV_DEPTH[] = "r_depth";
-static const char FSR2_BIND_SRV_REACTIVE_MASK[] = "r_reactive_mask";
-static const char FSR2_BIND_SRV_LOCK_STATUS[] = "r_lock_status";
-static const char FSR2_BIND_SRV_PREPARED_INPUT_COLOR[] = "r_prepared_input_color";
-static const char FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK[] = "r_transparency_and_composition_mask";
-static const char FSR2_BIND_SRV_INTERNAL_UPSCALED[] = "r_internal_upscaled_color";
-static const char FSR2_BIND_SRV_DEPTH_CLIP[] = "r_depth_clip";
-static const char FSR2_BIND_SRV_LUMA_HISTORY[] = "r_luma_history";
-static const char FSR2_BIND_SRV_LANCZOS_LUT[] = "r_lanczos_lut";
-static const char FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT[] = "r_upsample_maximum_bias_lut";
-static const char FSR2_BIND_SRV_REACTIVE_MAX[] = "r_reactive_max";
-static const char FSR2_BIND_SRV_EXPOSURE_MIPS[] = "r_imgMips";
-static const char FSR2_BIND_SRV_RCAS_INPUT[] = "r_rcas_input";
-static const char FSR2_BIND_SRV_PRE_ALPHA_COLOR[] = "r_input_color_pre_alpha";
-static const char FSR2_BIND_SRV_POST_ALPHA_COLOR[] = "r_input_color_post_alpha";
+static const wchar_t FSR2_BIND_SRV_INPUT_COLOR[] = L"r_input_color_jittered";
+static const wchar_t FSR2_BIND_SRV_EXPOSURE[] = L"r_exposure";
+static const wchar_t FSR2_BIND_SRV_DILATED_DEPTH[] = L"r_dilatedDepth";
+static const wchar_t FSR2_BIND_SRV_DILATED_MOTION_VECTORS[] = L"r_dilated_motion_vectors";
+static const wchar_t FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"r_ReconstructedPrevNearestDepth";
+static const wchar_t FSR2_BIND_SRV_MOTION_VECTORS[] = L"r_motion_vectors";
+static const wchar_t FSR2_BIND_SRV_DEPTH[] = L"r_depth";
+static const wchar_t FSR2_BIND_SRV_REACTIVE_MASK[] = L"r_reactive_mask";
+static const wchar_t FSR2_BIND_SRV_LOCK_STATUS[] = L"r_lock_status";
+static const wchar_t FSR2_BIND_SRV_PREPARED_INPUT_COLOR[] = L"r_prepared_input_color";
+static const wchar_t FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK[] = L"r_transparency_and_composition_mask";
+static const wchar_t FSR2_BIND_SRV_INTERNAL_UPSCALED[] = L"r_internal_upscaled_color";
+static const wchar_t FSR2_BIND_SRV_DEPTH_CLIP[] = L"r_depth_clip";
+static const wchar_t FSR2_BIND_SRV_LUMA_HISTORY[] = L"r_luma_history";
+static const wchar_t FSR2_BIND_SRV_LANCZOS_LUT[] = L"r_lanczos_lut";
+static const wchar_t FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT[] = L"r_upsample_maximum_bias_lut";
+static const wchar_t FSR2_BIND_SRV_DILATED_REACTIVE_MASKS[] = L"r_dilated_reactive_masks";
+static const wchar_t FSR2_BIND_SRV_EXPOSURE_MIPS[] = L"r_imgMips";
+static const wchar_t FSR2_BIND_SRV_RCAS_INPUT[] = L"r_rcas_input";
+static const wchar_t FSR2_BIND_SRV_PRE_ALPHA_COLOR[] = L"r_input_color_pre_alpha";
+static const wchar_t FSR2_BIND_SRV_POST_ALPHA_COLOR[] = L"r_input_color_post_alpha";
 
-static const char FSR2_BIND_UAV_DEPTH_CLIP[] = "rw_depth_clip";
-static const char FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = "rw_ReconstructedPrevNearestDepth";
-static const char FSR2_BIND_UAV_PREPARED_INPUT_COLOR[] =  "rw_prepared_input_color";
-static const char FSR2_BIND_UAV_LUMA_HISTORY[] = "rw_luma_history";
-static const char FSR2_BIND_UAV_DILATED_MOTION_VECTORS[] = "rw_dilated_motion_vectors";
-static const char FSR2_BIND_UAV_DILATED_DEPTH[] = "rw_dilatedDepth";
-static const char FSR2_BIND_UAV_LOCK_STATUS[] = "rw_lock_status";
-static const char FSR2_BIND_UAV_REACTIVE_MASK_MAX[] = "rw_reactive_max";
-static const char FSR2_BIND_UAV_INTERNAL_UPSCALED[] = "rw_internal_upscaled_color";
-static const char FSR2_BIND_UAV_UPSCALED_OUTPUT[] = "rw_upscaled_output";
-static const char FSR2_BIND_UAV_SPD_GLOBAL_ATOMIC[] = "rw_spd_global_atomic";
-static const char FSR2_BIND_UAV_EXPOSURE_MIP_LUMA_CHANGE[] = "rw_img_mip_shading_change";
-static const char FSR2_BIND_UAV_EXPOSURE_MIP_5[] = "rw_img_mip_5";
-static const char FSR2_BIND_UAV_EXPOSURE[] = "rw_exposure";
-static const char FSR2_BIND_UAV_REACTIVE[] = "rw_output_reactive_mask";
+static const wchar_t FSR2_BIND_UAV_DEPTH_CLIP[] = L"rw_depth_clip";
+static const wchar_t FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH[] = L"rw_ReconstructedPrevNearestDepth";
+static const wchar_t FSR2_BIND_UAV_PREPARED_INPUT_COLOR[] = L"rw_prepared_input_color";
+static const wchar_t FSR2_BIND_UAV_LUMA_HISTORY[] = L"rw_luma_history";
+static const wchar_t FSR2_BIND_UAV_DILATED_MOTION_VECTORS[] = L"rw_dilated_motion_vectors";
+static const wchar_t FSR2_BIND_UAV_DILATED_DEPTH[] = L"rw_dilatedDepth";
+static const wchar_t FSR2_BIND_UAV_LOCK_STATUS[] = L"rw_lock_status";
+static const wchar_t FSR2_BIND_UAV_DILATED_REACTIVE_MASKS[] = L"rw_dilated_reactive_masks";
+static const wchar_t FSR2_BIND_UAV_INTERNAL_UPSCALED[] = L"rw_internal_upscaled_color";
+static const wchar_t FSR2_BIND_UAV_UPSCALED_OUTPUT[] = L"rw_upscaled_output";
+static const wchar_t FSR2_BIND_UAV_SPD_GLOBAL_ATOMIC[] = L"rw_spd_global_atomic";
+static const wchar_t FSR2_BIND_UAV_EXPOSURE_MIP_LUMA_CHANGE[] = L"rw_img_mip_shading_change";
+static const wchar_t FSR2_BIND_UAV_EXPOSURE_MIP_5[] = L"rw_img_mip_5";
+static const wchar_t FSR2_BIND_UAV_EXPOSURE[] = L"rw_exposure";
+static const wchar_t FSR2_BIND_UAV_REACTIVE[] = L"rw_output_reactive_mask";
 
-static const char FSR2_BIND_CB_FSR2[] = "cbFSR2";
-static const char FSR2_BIND_CB_RCAS[] = "cbRCAS";
-static const char FSR2_BIND_CB_SPD[] = "cbSPD";
-static const char FSR2_BIND_CB_REACTIVE[] = "cbGenerateReactive";
+static const wchar_t FSR2_BIND_CB_FSR2[] = L"cbFSR2";
+static const wchar_t FSR2_BIND_CB_RCAS[] = L"cbRCAS";
+static const wchar_t FSR2_BIND_CB_SPD[] = L"cbSPD";
+static const wchar_t FSR2_BIND_CB_REACTIVE[] = L"cbGenerateReactive";
 
-static const char *input_color_table[] = {
+static const wchar_t *input_color_table[] = {
 	FSR2_BIND_SRV_INPUT_COLOR,
 	FSR2_BIND_SRV_EXPOSURE,
 	FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH,
@@ -80,7 +80,7 @@ static const char *input_color_table[] = {
 	FSR2_BIND_CB_FSR2,
 };
 
-static const char *depth_clip_table[] = {
+static const wchar_t *depth_clip_table[] = {
 	FSR2_BIND_SRV_RECONSTRUCTED_PREV_NEAREST_DEPTH,
 	FSR2_BIND_SRV_DILATED_MOTION_VECTORS,
 	FSR2_BIND_SRV_DILATED_DEPTH,
@@ -88,7 +88,7 @@ static const char *depth_clip_table[] = {
 	FSR2_BIND_CB_FSR2,
 };
 
-static const char *reconstruct_previous_depth_table[] = {
+static const wchar_t *reconstruct_previous_depth_table[] = {
 	FSR2_BIND_SRV_MOTION_VECTORS,
 	FSR2_BIND_SRV_DEPTH,
 	FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH,
@@ -97,16 +97,16 @@ static const char *reconstruct_previous_depth_table[] = {
 	FSR2_BIND_CB_FSR2,
 };
 
-static const char *lock_table[] = {
+static const wchar_t *lock_table[] = {
 	FSR2_BIND_SRV_REACTIVE_MASK,
 	FSR2_BIND_SRV_LOCK_STATUS,
 	FSR2_BIND_SRV_PREPARED_INPUT_COLOR,
 	FSR2_BIND_UAV_LOCK_STATUS,
-	FSR2_BIND_UAV_REACTIVE_MASK_MAX,
+	FSR2_BIND_UAV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_CB_FSR2,
 };
 
-static const char *accumulate_table[] = {
+static const wchar_t *accumulate_table[] = {
 	FSR2_BIND_SRV_EXPOSURE,
 	FSR2_BIND_SRV_TRANSPARENCY_AND_COMPOSITION_MASK,
 	FSR2_BIND_SRV_DILATED_MOTION_VECTORS,
@@ -117,7 +117,7 @@ static const char *accumulate_table[] = {
 	FSR2_BIND_SRV_LUMA_HISTORY,
 	FSR2_BIND_SRV_LANCZOS_LUT,
 	FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT,
-	FSR2_BIND_SRV_REACTIVE_MAX,
+	FSR2_BIND_SRV_DILATED_REACTIVE_MASKS,
 	FSR2_BIND_SRV_EXPOSURE_MIPS,
 	FSR2_BIND_UAV_INTERNAL_UPSCALED,
 	FSR2_BIND_UAV_LOCK_STATUS,
@@ -125,7 +125,7 @@ static const char *accumulate_table[] = {
 	FSR2_BIND_CB_FSR2,
 };
 
-static const char *rcas_table[] = {
+static const wchar_t *rcas_table[] = {
 	FSR2_BIND_SRV_EXPOSURE,
 	FSR2_BIND_SRV_RCAS_INPUT,
 	FSR2_BIND_UAV_UPSCALED_OUTPUT,
@@ -133,7 +133,7 @@ static const char *rcas_table[] = {
 	FSR2_BIND_CB_RCAS,
 };
 
-static const char *compute_luminance_pyramid_table[] = {
+static const wchar_t *compute_luminance_pyramid_table[] = {
 	FSR2_BIND_SRV_INPUT_COLOR,
 	FSR2_BIND_UAV_SPD_GLOBAL_ATOMIC,
 	FSR2_BIND_UAV_EXPOSURE_MIP_LUMA_CHANGE,
@@ -143,7 +143,7 @@ static const char *compute_luminance_pyramid_table[] = {
 	FSR2_BIND_CB_SPD,
 };
 
-static const char *generate_reactive_table[] = {
+static const wchar_t *generate_reactive_table[] = {
 	FSR2_BIND_SRV_PRE_ALPHA_COLOR,
 	FSR2_BIND_SRV_POST_ALPHA_COLOR,
 	FSR2_BIND_UAV_REACTIVE,
@@ -155,7 +155,7 @@ struct Fsr2ShaderBlobGranite
 {
 	std::string path;
 	std::vector<std::pair<std::string, int>> defines;
-	const char * const *name_table;
+	const wchar_t * const *name_table;
 };
 
 static FfxErrorCode fsr2GetPermutationBlobByIndex(FfxFsr2Pass passId, uint32_t permutationOptions, Fsr2ShaderBlobGranite *outBlob)

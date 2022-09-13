@@ -29,7 +29,7 @@
 #include "command_buffer.hpp"
 
 static constexpr unsigned FSR2_MAX_RESOURCE_COUNT = 64;
-static constexpr unsigned FSR2_MAX_RENDERJOBS = 32;
+static constexpr unsigned FSR2_MAX_GPU_JOBS = 32;
 static constexpr unsigned FSR2_MAX_BARRIERS = 16;
 
 namespace Granite
@@ -75,7 +75,7 @@ struct Context
 	Pipeline pipelines[FFX_FSR2_PASS_COUNT] = {};
 
 	unsigned renderJobCount = 0;
-	FfxRenderJobDescription renderJobs[FSR2_MAX_RENDERJOBS] = {};
+	FfxGpuJobDescription renderJobs[FSR2_MAX_GPU_JOBS] = {};
 
 	// Barrier batching.
 	VkImageMemoryBarrier imageBarriers[FSR2_MAX_BARRIERS];
@@ -88,7 +88,7 @@ struct Context
 
 static FfxErrorCode GetDeviceCapabilities(FfxFsr2Interface* backendInterface, FfxDeviceCapabilities* deviceCapabilities, FfxDevice device);
 static FfxErrorCode CreateDevice(FfxFsr2Interface* backendInterface, FfxDevice device);
-static FfxErrorCode DestroyDevice(FfxFsr2Interface* backendInterface, FfxDevice device);
+static FfxErrorCode DestroyDevice(FfxFsr2Interface* backendInterface);
 static FfxErrorCode CreateResource(FfxFsr2Interface* backendInterface, const FfxCreateResourceDescription* desc, FfxResourceInternal* outResource);
 static FfxErrorCode RegisterResource(FfxFsr2Interface* backendInterface, const FfxResource* inResource, FfxResourceInternal* outResourceInternal);
 static FfxErrorCode UnregisterResources(FfxFsr2Interface* backendInterface);
@@ -96,7 +96,7 @@ static FfxResourceDescription GetResourceDescriptor(FfxFsr2Interface* backendInt
 static FfxErrorCode DestroyResource(FfxFsr2Interface* backendInterface, FfxResourceInternal resource);
 static FfxErrorCode CreatePipeline(FfxFsr2Interface* backendInterface, FfxFsr2Pass passId, const FfxPipelineDescription* desc, FfxPipelineState* outPass);
 static FfxErrorCode DestroyPipeline(FfxFsr2Interface* backendInterface, FfxPipelineState* pipeline);
-static FfxErrorCode ScheduleRenderJob(FfxFsr2Interface* backendInterface, const FfxRenderJobDescription* job);
+static FfxErrorCode ScheduleRenderJob(FfxFsr2Interface* backendInterface, const FfxGpuJobDescription* job);
 static FfxErrorCode ExecuteRenderJobs(FfxFsr2Interface* backendInterface, FfxCommandList commandList);
 }
 }
@@ -244,8 +244,8 @@ FFX_API FfxErrorCode ffxFsr2GetInterfaceGranite(
 		FFX_ERROR_INSUFFICIENT_MEMORY);
 
 	outInterface->fpGetDeviceCapabilities = Granite::FSR2::GetDeviceCapabilities;
-	outInterface->fpCreateDevice = Granite::FSR2::CreateDevice;
-	outInterface->fpDestroyDevice = Granite::FSR2::DestroyDevice;
+	outInterface->fpCreateBackendContext = Granite::FSR2::CreateDevice;
+	outInterface->fpDestroyBackendContext = Granite::FSR2::DestroyDevice;
 	outInterface->fpCreateResource = Granite::FSR2::CreateResource;
 	outInterface->fpRegisterResource = Granite::FSR2::RegisterResource;
 	outInterface->fpUnregisterResources = Granite::FSR2::UnregisterResources;
@@ -253,8 +253,8 @@ FFX_API FfxErrorCode ffxFsr2GetInterfaceGranite(
 	outInterface->fpDestroyResource = Granite::FSR2::DestroyResource;
 	outInterface->fpCreatePipeline = Granite::FSR2::CreatePipeline;
 	outInterface->fpDestroyPipeline = Granite::FSR2::DestroyPipeline;
-	outInterface->fpScheduleRenderJob = Granite::FSR2::ScheduleRenderJob;
-	outInterface->fpExecuteRenderJobs = Granite::FSR2::ExecuteRenderJobs;
+	outInterface->fpScheduleGpuJob = Granite::FSR2::ScheduleRenderJob;
+	outInterface->fpExecuteGpuJobs = Granite::FSR2::ExecuteRenderJobs;
 
 	auto *context = new(scratchBuffer) Granite::FSR2::Context();
 	FFX_ASSERT(context == scratchBuffer);
@@ -329,7 +329,7 @@ FfxErrorCode Granite::FSR2::CreateDevice(FfxFsr2Interface *backendInterface, Ffx
 	return FFX_OK;
 }
 
-FfxErrorCode Granite::FSR2::DestroyDevice(FfxFsr2Interface* backendInterface, FfxDevice)
+FfxErrorCode Granite::FSR2::DestroyDevice(FfxFsr2Interface* backendInterface)
 {
 	FFX_ASSERT(backendInterface);
 	auto *backendContext = static_cast<Granite::FSR2::Context *>(backendInterface->scratchBuffer);
@@ -361,8 +361,8 @@ FfxErrorCode Granite::FSR2::CreateResource(
 	FFX_ASSERT(createResourceDescription);
 	FFX_ASSERT(outResource);
 
-	auto *device = static_cast<Vulkan::Device *>(createResourceDescription->device);
 	auto *backendContext = static_cast<Granite::FSR2::Context *>(backendInterface->scratchBuffer);
+	auto *device = backendContext->device;
 
 	FFX_ASSERT(backendContext->nextStaticResource + 1 < backendContext->nextDynamicResource);
 	outResource->internalIndex = backendContext->nextStaticResource++;
@@ -664,8 +664,8 @@ FfxErrorCode Granite::FSR2::CreatePipeline(FfxFsr2Interface *backendInterface, F
 	Util::for_each_bit(set_layout.separate_image_mask |
 	                   set_layout.sampled_texel_buffer_mask, [&](unsigned bit) {
 		outPipeline->srvResourceBindings[outPipeline->srvCount].slotIndex = bit;
-		strcpy_s(outPipeline->srvResourceBindings[outPipeline->srvCount].name,
-		         shaderBlob.name_table[bit]);
+		wcscpy(outPipeline->srvResourceBindings[outPipeline->srvCount].name,
+		       shaderBlob.name_table[bit]);
 		outPipeline->srvCount++;
 	});
 
@@ -673,15 +673,15 @@ FfxErrorCode Granite::FSR2::CreatePipeline(FfxFsr2Interface *backendInterface, F
 	                   set_layout.storage_buffer_mask |
 	                   set_layout.storage_texel_buffer_mask, [&](unsigned bit) {
 		outPipeline->uavResourceBindings[outPipeline->uavCount].slotIndex = bit;
-		strcpy_s(outPipeline->uavResourceBindings[outPipeline->uavCount].name,
-		         shaderBlob.name_table[bit]);
+		wcscpy(outPipeline->uavResourceBindings[outPipeline->uavCount].name,
+		       shaderBlob.name_table[bit]);
 		outPipeline->uavCount++;
 	});
 
 	Util::for_each_bit(set_layout.uniform_buffer_mask, [&](unsigned bit) {
 		outPipeline->cbResourceBindings[outPipeline->constCount].slotIndex = bit;
-		strcpy_s(outPipeline->cbResourceBindings[outPipeline->constCount].name,
-		         shaderBlob.name_table[bit]);
+		wcscpy(outPipeline->cbResourceBindings[outPipeline->constCount].name,
+		       shaderBlob.name_table[bit]);
 		outPipeline->constCount++;
 	});
 
@@ -699,16 +699,16 @@ FfxErrorCode Granite::FSR2::DestroyPipeline(FfxFsr2Interface *backendInterface, 
 	return FFX_OK;
 }
 
-FfxErrorCode Granite::FSR2::ScheduleRenderJob(FfxFsr2Interface *backendInterface, const FfxRenderJobDescription *job)
+FfxErrorCode Granite::FSR2::ScheduleRenderJob(FfxFsr2Interface *backendInterface, const FfxGpuJobDescription *job)
 {
 	FFX_ASSERT(backendInterface);
 	FFX_ASSERT(job);
 
 	auto *backendContext = static_cast<Granite::FSR2::Context *>(backendInterface->scratchBuffer);
-	FFX_ASSERT(backendContext->renderJobCount < FSR2_MAX_RENDERJOBS);
+	FFX_ASSERT(backendContext->renderJobCount < FSR2_MAX_GPU_JOBS);
 	backendContext->renderJobs[backendContext->renderJobCount] = *job;
 
-	if (job->jobType == FFX_RENDER_JOB_COMPUTE)
+	if (job->jobType == FFX_GPU_JOB_COMPUTE)
 	{
 		// needs to copy SRVs and UAVs in case they are on the stack only
 		auto *computeJob = &backendContext->renderJobs[backendContext->renderJobCount].computeJobDescriptor;
@@ -863,7 +863,7 @@ static void addBarrier(Granite::FSR2::Context *backendContext, FfxResourceIntern
 }
 
 static FfxErrorCode executeRenderJobClearFloat(Granite::FSR2::Context *backendContext,
-                                               FfxRenderJobDescription* job, Vulkan::CommandBuffer &cmd)
+                                               FfxGpuJobDescription* job, Vulkan::CommandBuffer &cmd)
 {
 	uint32_t idx = job->clearJobDescriptor.target.internalIndex;
 	const auto &ffxResource = backendContext->resources[idx];
@@ -887,7 +887,7 @@ static FfxErrorCode executeRenderJobClearFloat(Granite::FSR2::Context *backendCo
 }
 
 static FfxErrorCode executeRenderJobCopy(Granite::FSR2::Context *backendContext,
-                                         FfxRenderJobDescription* job, Vulkan::CommandBuffer &cmd)
+                                         FfxGpuJobDescription* job, Vulkan::CommandBuffer &cmd)
 {
 	auto &ffxResourceSrc = backendContext->resources[job->copyJobDescriptor.src.internalIndex];
 	auto &ffxResourceDst = backendContext->resources[job->copyJobDescriptor.dst.internalIndex];
@@ -934,7 +934,7 @@ static FfxErrorCode executeRenderJobCopy(Granite::FSR2::Context *backendContext,
 }
 
 static FfxErrorCode executeRenderJobCompute(Granite::FSR2::Context *backendContext,
-                                            FfxRenderJobDescription *job,
+                                            FfxGpuJobDescription *job,
                                             Vulkan::CommandBuffer &cmd)
 {
 	// bind uavs
@@ -995,21 +995,21 @@ FfxErrorCode Granite::FSR2::ExecuteRenderJobs(FfxFsr2Interface *backendInterface
 	// execute all renderjobs
 	for (uint32_t i = 0; i < backendContext->renderJobCount; i++)
 	{
-		FfxRenderJobDescription* renderJob = &backendContext->renderJobs[i];
+		FfxGpuJobDescription* renderJob = &backendContext->renderJobs[i];
 		auto *cmd = static_cast<Vulkan::CommandBuffer *>(commandList);
 		FFX_ASSERT(cmd);
 
 		switch (renderJob->jobType)
 		{
-		case FFX_RENDER_JOB_CLEAR_FLOAT:
+		case FFX_GPU_JOB_CLEAR_FLOAT:
 			errorCode = executeRenderJobClearFloat(backendContext, renderJob, *cmd);
 			break;
 
-		case FFX_RENDER_JOB_COPY:
+		case FFX_GPU_JOB_COPY:
 			errorCode = executeRenderJobCopy(backendContext, renderJob, *cmd);
 			break;
 
-		case FFX_RENDER_JOB_COMPUTE:
+		case FFX_GPU_JOB_COMPUTE:
 			errorCode = executeRenderJobCompute(backendContext, renderJob, *cmd);
 			break;
 
