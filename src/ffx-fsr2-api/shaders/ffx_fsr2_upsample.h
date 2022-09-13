@@ -89,20 +89,12 @@ FFX_MIN16_F Pow3(FFX_MIN16_F x)
 
 FfxFloat32x4 ComputeUpsampledColorAndWeight(FfxInt32x2 iPxHrPos, FfxFloat32x2 fKernelWeight, FFX_PARAMETER_INOUT RectificationBoxData clippingBox)
 {
-#if FFX_FSR2_OPTION_UPSAMPLE_SAMPLERS_USE_DATA_HALF && FFX_HALF
-#include "ffx_fsr2_force16_begin.h"
-#endif
     // We compute a sliced lanczos filter with 2 lobes (other slices are accumulated temporaly)
     FfxFloat32x2 fDstOutputPos = FfxFloat32x2(iPxHrPos) + FFX_BROADCAST_FLOAT32X2(0.5f);      // Destination resolution output pixel center position
     FfxFloat32x2 fSrcOutputPos = fDstOutputPos * DownscaleFactor();                   // Source resolution output pixel center position
     FfxInt32x2 iSrcInputPos = FfxInt32x2(floor(fSrcOutputPos));                     // TODO: what about weird upscale factors...
 
 #if FFX_FSR2_OPTION_UPSAMPLE_SAMPLERS_USE_DATA_HALF && FFX_HALF
-#include "ffx_fsr2_force16_end.h"
-#endif
-
-#if FFX_FSR2_OPTION_UPSAMPLE_SAMPLERS_USE_DATA_HALF && FFX_HALF
-#include "ffx_fsr2_force16_begin.h"
     RectificationBoxMin16 fRectificationBox;
 #else
     RectificationBox fRectificationBox;
@@ -200,9 +192,6 @@ FfxFloat32x4 ComputeUpsampledColorAndWeight(FfxInt32x2 iPxHrPos, FfxFloat32x2 fK
     if (any(FFX_LESS_THAN(fKernelWeight, FfxFloat32x2(1, 1)))) {
         fWeight = FfxFloat32(averageLanczosWeightPerFrame);
     }
-#if FFX_FSR2_OPTION_UPSAMPLE_SAMPLERS_USE_DATA_HALF && FFX_HALF
-#include "ffx_fsr2_force16_end.h"
-#endif
 
 #if FFX_FSR2_OPTION_GUARANTEE_POSITIVE_UPSAMPLE_WEIGHT
     return FfxFloat32x4(fColor, ffxMax(FfxFloat32(FSR2_EPSILON), fWeight));
