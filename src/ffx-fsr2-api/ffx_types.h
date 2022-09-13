@@ -51,7 +51,9 @@
 #define FFX_MAX_CONST_SIZE          64
 
 /// Off by default warnings
+#ifdef _MSC_VER
 #pragma warning(disable : 4365 4710 4820 5039)
+#endif
 
 #ifdef __cplusplus
 extern "C" {
