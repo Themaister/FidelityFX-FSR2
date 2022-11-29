@@ -623,9 +623,7 @@ FfxErrorCode Granite::FSR2::CreatePipeline(FfxFsr2Interface *backendInterface, F
 	bool useLut = canForceWave64;
 
 	// check if we have 16bit floating point.
-	//bool supportedFP16 = device->get_device_features().float16_int8_features.shaderFloat16;
-	// TODO: Figure out rendering glitches with FP32.
-	bool supportedFP16 = false;
+	bool supportedFP16 = device->get_device_features().float16_int8_features.shaderFloat16;
 
 	if (pass == FFX_FSR2_PASS_ACCUMULATE || pass == FFX_FSR2_PASS_ACCUMULATE_SHARPEN)
 	{
