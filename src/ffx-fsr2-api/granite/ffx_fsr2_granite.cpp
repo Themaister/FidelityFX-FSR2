@@ -78,12 +78,9 @@ struct Context
 	FfxGpuJobDescription renderJobs[FSR2_MAX_GPU_JOBS] = {};
 
 	// Barrier batching.
-	VkImageMemoryBarrier imageBarriers[FSR2_MAX_BARRIERS];
-	VkBufferMemoryBarrier bufferBarriers[FSR2_MAX_BARRIERS];
-	unsigned imageBarrierCount = 0;
-	unsigned bufferBarrierCount = 0;
-	VkPipelineStageFlags srcStageMask = 0;
-	VkPipelineStageFlags dstStageMask = 0;
+	VkImageMemoryBarrier2 imageBarriers[FSR2_MAX_BARRIERS];
+	VkBufferMemoryBarrier2 bufferBarriers[FSR2_MAX_BARRIERS];
+	VkDependencyInfo barriers = { VK_STRUCTURE_TYPE_DEPENDENCY_INFO };
 };
 
 static FfxErrorCode GetDeviceCapabilities(FfxFsr2Interface* backendInterface, FfxDeviceCapabilities* deviceCapabilities, FfxDevice device);
@@ -748,7 +745,7 @@ static VkImageLayout getVKImageLayoutFromResourceState(FfxResourceStates state)
 	}
 }
 
-static VkPipelineStageFlags getVKPipelineStageFlagsFromResourceState(FfxResourceStates state)
+static VkPipelineStageFlags2 getVKPipelineStageFlagsFromResourceState(FfxResourceStates state)
 {
 	switch (state)
 	{
@@ -758,22 +755,22 @@ static VkPipelineStageFlags getVKPipelineStageFlagsFromResourceState(FfxResource
 		return VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 	case FFX_RESOURCE_STATE_COPY_SRC:
 	case FFX_RESOURCE_STATE_COPY_DEST:
-		return VK_PIPELINE_STAGE_TRANSFER_BIT;
+		return VK_PIPELINE_STAGE_2_COPY_BIT | VK_PIPELINE_STAGE_2_CLEAR_BIT;
 	default:
 		return VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 	}
 }
 
-static VkAccessFlags getVKAccessFlagsFromResourceState(FfxResourceStates state)
+static VkAccessFlags2 getVKAccessFlagsFromResourceState(FfxResourceStates state)
 {
 	switch (state)
 	{
 	case FFX_RESOURCE_STATE_GENERIC_READ:
-		return VK_ACCESS_SHADER_READ_BIT;
+		return VK_ACCESS_2_SHADER_SAMPLED_READ_BIT | VK_ACCESS_2_SHADER_STORAGE_READ_BIT;
 	case FFX_RESOURCE_STATE_UNORDERED_ACCESS:
-		return VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+		return VK_ACCESS_2_SHADER_STORAGE_READ_BIT | VK_ACCESS_2_SHADER_STORAGE_WRITE_BIT;
 	case FFX_RESOURCE_STATE_COMPUTE_READ:
-		return VK_ACCESS_SHADER_READ_BIT;
+		return VK_ACCESS_2_SHADER_SAMPLED_READ_BIT;
 	case FFX_RESOURCE_STATE_COPY_SRC:
 		return VK_ACCESS_TRANSFER_READ_BIT;
 	case FFX_RESOURCE_STATE_COPY_DEST:
@@ -787,16 +784,14 @@ static void flushBarriers(Granite::FSR2::Context *backendContext, Vulkan::Comman
 {
 	FFX_ASSERT(backendContext);
 
-	if (backendContext->bufferBarrierCount > 0 || backendContext->imageBarrierCount > 0)
+	if (backendContext->barriers.bufferMemoryBarrierCount > 0 ||
+	    backendContext->barriers.imageMemoryBarrierCount > 0)
 	{
-		cmd.barrier(backendContext->srcStageMask, backendContext->dstStageMask,
-		            0, nullptr,
-		            backendContext->bufferBarrierCount, backendContext->bufferBarriers,
-		            backendContext->imageBarrierCount, backendContext->imageBarriers);
-		backendContext->imageBarrierCount = 0;
-		backendContext->bufferBarrierCount = 0;
-		backendContext->srcStageMask = 0;
-		backendContext->dstStageMask = 0;
+		backendContext->barriers.pBufferMemoryBarriers = backendContext->bufferBarriers;
+		backendContext->barriers.pImageMemoryBarriers = backendContext->imageBarriers;
+		cmd.barrier(backendContext->barriers);
+		backendContext->barriers.bufferMemoryBarrierCount = 0;
+		backendContext->barriers.imageMemoryBarrierCount = 0;
 	}
 }
 
@@ -817,9 +812,9 @@ static void addBarrier(Granite::FSR2::Context *backendContext, FfxResourceIntern
 	if (ffxResource.resourceDescription.type == FFX_RESOURCE_TYPE_BUFFER)
 	{
 		auto &buffer = *ffxResource.buffer;
-		auto *barrier = &backendContext->bufferBarriers[backendContext->bufferBarrierCount];
+		auto *barrier = &backendContext->bufferBarriers[backendContext->barriers.bufferMemoryBarrierCount];
 
-		barrier->sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		barrier->sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2;
 		barrier->pNext = nullptr;
 		barrier->srcAccessMask = getVKAccessFlagsFromResourceState(curState);
 		barrier->dstAccessMask = getVKAccessFlagsFromResourceState(newState);
@@ -828,15 +823,14 @@ static void addBarrier(Granite::FSR2::Context *backendContext, FfxResourceIntern
 		barrier->buffer = buffer.get_buffer();
 		barrier->offset = 0;
 		barrier->size = VK_WHOLE_SIZE;
-
-		backendContext->srcStageMask |= getVKPipelineStageFlagsFromResourceState(curState);
-		backendContext->dstStageMask |= getVKPipelineStageFlagsFromResourceState(newState);
-		backendContext->bufferBarrierCount++;
+		barrier->srcStageMask = getVKPipelineStageFlagsFromResourceState(curState);
+		barrier->dstStageMask = getVKPipelineStageFlagsFromResourceState(newState);
+		backendContext->barriers.bufferMemoryBarrierCount++;
 	}
 	else
 	{
 		auto &image = *ffxResource.image;
-		auto *barrier = &backendContext->imageBarriers[backendContext->imageBarrierCount];
+		auto *barrier = &backendContext->imageBarriers[backendContext->barriers.imageMemoryBarrierCount];
 
 		VkImageSubresourceRange range;
 		range.aspectMask = backendContext->resources[resource->internalIndex].aspectFlags;
@@ -845,7 +839,7 @@ static void addBarrier(Granite::FSR2::Context *backendContext, FfxResourceIntern
 		range.baseArrayLayer = 0;
 		range.layerCount = 1;
 
-		barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
 		barrier->pNext = nullptr;
 		barrier->srcAccessMask = getVKAccessFlagsFromResourceState(curState);
 		barrier->dstAccessMask = getVKAccessFlagsFromResourceState(newState);
@@ -855,10 +849,9 @@ static void addBarrier(Granite::FSR2::Context *backendContext, FfxResourceIntern
 		barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier->image = image.get_image();
 		barrier->subresourceRange = range;
-
-		backendContext->srcStageMask |= getVKPipelineStageFlagsFromResourceState(curState);
-		backendContext->dstStageMask |= getVKPipelineStageFlagsFromResourceState(newState);
-		backendContext->imageBarrierCount++;
+		barrier->srcStageMask = getVKPipelineStageFlagsFromResourceState(curState);
+		barrier->dstStageMask = getVKPipelineStageFlagsFromResourceState(newState);
+		backendContext->barriers.imageMemoryBarrierCount++;
 	}
 
 	curState = newState;
