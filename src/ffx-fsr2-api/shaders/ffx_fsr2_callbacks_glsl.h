@@ -238,7 +238,7 @@ layout (set = 0, binding = 1) uniform sampler s_LinearClamp;
 	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_MOTION_VECTORS, rg16f)           writeonly uniform image2D  rw_dilated_motion_vectors;
 #endif
 #if defined FSR2_BIND_UAV_DILATED_DEPTH
-	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_DEPTH, r16f)                     writeonly uniform image2D  rw_dilatedDepth;
+	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_DEPTH, r32f)                     writeonly uniform image2D  rw_dilatedDepth;
 #endif
 #if defined FSR2_BIND_UAV_INTERNAL_UPSCALED
 	layout (set = 1, binding = FSR2_BIND_UAV_INTERNAL_UPSCALED, rgba16f)              writeonly uniform image2D  rw_internal_upscaled_color;
@@ -516,10 +516,6 @@ void SetReconstructedDepth(FfxInt32x2 iPxSample, FfxUInt32 uValue)
 #if defined(FSR2_BIND_UAV_DILATED_DEPTH)
 void StoreDilatedDepth(FFX_PARAMETER_IN FfxInt32x2 iPxPos, FFX_PARAMETER_IN FfxFloat32 fDepth)
 {
-	//FfxUInt32 uDepth = f32tof16(fDepth);
-#if !FFX_FSR2_OPTION_INVERTED_DEPTH
-	fDepth = 1.0 - fDepth; // maister: Preserve precision as well as we can in FP16.
-#endif
 	imageStore(rw_dilatedDepth, iPxPos, vec4(fDepth, 0.0f, 0.0f, 0.0f));
 }
 #endif
@@ -560,11 +556,7 @@ FfxFloat32x2 SamplePreviousDilatedMotionVector(FfxFloat32x2 fUV)
 #if defined(FSR2_BIND_SRV_DILATED_DEPTH)
 FfxFloat32 LoadDilatedDepth(FfxInt32x2 iPxInput)
 {
-	FfxFloat32 d = texelFetch(r_dilatedDepth, iPxInput, 0).r;
-#if !FFX_FSR2_OPTION_INVERTED_DEPTH
-	d = 1.0 - d; // maister: Reconstruct from FP16.
-#endif
-    return d;
+	return texelFetch(r_dilatedDepth, iPxInput, 0).r;
 }
 #endif
 
