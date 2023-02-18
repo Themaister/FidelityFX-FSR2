@@ -687,17 +687,25 @@ static void setupDeviceDepthToViewSpaceDepthParams(FfxFsr2Context_Private* conte
     const float d = -1.0f; // for clarity
 
     const float matrix_elem_c[2][2] = {
-        fQ,                     // non reversed, non infinite
-        -1.0f - FLT_EPSILON,    // non reversed, infinite
-        fQ,                     // reversed, non infinite
-        0.0f + FLT_EPSILON      // reversed, infinite
+        {
+            fQ,                     // non reversed, non infinite
+            -1.0f - FLT_EPSILON,    // non reversed, infinite
+        },
+        {
+            fQ,                     // reversed, non infinite
+            0.0f + FLT_EPSILON      // reversed, infinite
+        },
     };
 
     const float matrix_elem_e[2][2] = {
-        fQ * fMin,             // non reversed, non infinite
-        -fMin - FLT_EPSILON,    // non reversed, infinite
-        fQ * fMin,             // reversed, non infinite
-        fMax,                  // reversed, infinite
+        {
+            fQ * fMin,             // non reversed, non infinite
+            -fMin - FLT_EPSILON,   // non reversed, infinite
+        },
+        {
+            fQ * fMin,             // reversed, non infinite
+            fMax,                  // reversed, infinite
+        }
     };
 
     context->constants.deviceToViewDepth[0] = d * matrix_elem_c[bInverted][bInfinite];
