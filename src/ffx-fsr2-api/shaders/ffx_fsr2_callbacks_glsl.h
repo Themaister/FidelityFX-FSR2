@@ -560,7 +560,11 @@ FfxFloat32x2 SamplePreviousDilatedMotionVector(FfxFloat32x2 fUV)
 #if defined(FSR2_BIND_SRV_DILATED_DEPTH)
 FfxFloat32 LoadDilatedDepth(FfxInt32x2 iPxInput)
 {
-	return texelFetch(r_dilatedDepth, iPxInput, 0).r;
+	FfxFloat32 d = texelFetch(r_dilatedDepth, iPxInput, 0).r;
+#if !FFX_FSR2_OPTION_INVERTED_DEPTH
+	d = 1.0 - d; // maister: Reconstruct from FP16.
+#endif
+    return d;
 }
 #endif
 
