@@ -60,7 +60,12 @@ FfxFloat32 ComputeDepthClip(FfxFloat32x2 fUvSample, FfxFloat32 fCurrentDepthSamp
                     const FfxFloat32 fHalfViewportWidth = length(FfxFloat32x2(RenderSize()));
                     const FfxFloat32 fDepthThreshold = ffxMax(fCurrentDepthViewSpace, fPrevNearestDepthViewSpace);
 
+#if !FFX_FSR2_OPTION_INVERTED_DEPTH
+                    const FfxFloat32 Ksep = 4.0f * 1.37e-05f; // maister: Arbitrary hack to make normal depth work.
+#else
                     const FfxFloat32 Ksep = 1.37e-05f;
+#endif
+
                     const FfxFloat32 Kfov = length(fCorner) / length(fCenter);
                     const FfxFloat32 fRequiredDepthSeparation = Ksep * Kfov * fHalfViewportWidth * fDepthThreshold;
 
