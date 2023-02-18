@@ -713,7 +713,7 @@ static void setupDeviceDepthToViewSpaceDepthParams(FfxFsr2Context_Private* conte
     context->constants.deviceToViewDepth[3] = (1.0f / b);
 }
 
-static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2DispatchDescription* params, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
+static void scheduleDispatch(FfxFsr2Context_Private* context, const FfxFsr2DispatchDescription*, const FfxPipelineState* pipeline, uint32_t dispatchX, uint32_t dispatchY)
 {
     FfxComputeJobDescription jobDescriptor = {};
 
@@ -868,7 +868,7 @@ static FfxErrorCode fsr2Dispatch(FfxFsr2Context_Private* context, const FfxFsr2D
     // actual resource size may differ from render/display resolution (e.g. due to Hw/API restrictions), so query the descriptor for UVs adjustment
     const FfxResourceDescription resourceDescInputColor = context->contextDescription.callbacks.fpGetResourceDescription(&context->contextDescription.callbacks, context->srvResources[FFX_FSR2_RESOURCE_IDENTIFIER_INPUT_COLOR]);
     const FfxResourceDescription resourceDescLockStatus = context->contextDescription.callbacks.fpGetResourceDescription(&context->contextDescription.callbacks, context->srvResources[lockStatusSrvResourceIndex]);
-    const FfxResourceDescription resourceDescReactiveMask = context->contextDescription.callbacks.fpGetResourceDescription(&context->contextDescription.callbacks, context->srvResources[FFX_FSR2_RESOURCE_IDENTIFIER_INPUT_REACTIVE_MASK]);
+    //const FfxResourceDescription resourceDescReactiveMask = context->contextDescription.callbacks.fpGetResourceDescription(&context->contextDescription.callbacks, context->srvResources[FFX_FSR2_RESOURCE_IDENTIFIER_INPUT_REACTIVE_MASK]);
     FFX_ASSERT(resourceDescInputColor.type == FFX_RESOURCE_TYPE_TEXTURE2D);
     FFX_ASSERT(resourceDescLockStatus.type == FFX_RESOURCE_TYPE_TEXTURE2D);
 
@@ -1273,7 +1273,7 @@ FfxErrorCode ffxFsr2ContextGenerateReactiveMask(FfxFsr2Context* context, const F
         const uint32_t currentResourceId = pipeline->srvResourceBindings[currentShaderResourceViewIndex].resourceIdentifier;
         const FfxResourceInternal currentResource = contextPrivate->srvResources[currentResourceId];
         jobDescriptor.srvs[currentShaderResourceViewIndex] = currentResource;
-        wcscpy_s(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
     }
 
     Fsr2GenerateReactiveConstants constants = {};
@@ -1307,9 +1307,6 @@ static FfxErrorCode generateReactiveMaskInternal(FfxFsr2Context_Private* context
         contextPrivate->refreshPipelineStates = false;
     }
 
-    // take a short cut to the command list
-    FfxCommandList commandList = params->commandList;
-
     FfxPipelineState* pipeline = &contextPrivate->pipelineTcrAutogenerate;
 
     const int32_t threadGroupWorkRegionDim = 8;
@@ -1325,10 +1322,10 @@ static FfxErrorCode generateReactiveMaskInternal(FfxFsr2Context_Private* context
     jobDescriptor.uavs[2] = contextPrivate->uavResources[FFX_FSR2_RESOURCE_IDENTIFIER_PREV_PRE_ALPHA_COLOR];
     jobDescriptor.uavs[3] = contextPrivate->uavResources[FFX_FSR2_RESOURCE_IDENTIFIER_PREV_POST_ALPHA_COLOR];
 
-    wcscpy_s(jobDescriptor.uavNames[0], pipeline->uavResourceBindings[0].name);
-    wcscpy_s(jobDescriptor.uavNames[1], pipeline->uavResourceBindings[1].name);
-    wcscpy_s(jobDescriptor.uavNames[2], pipeline->uavResourceBindings[2].name);
-    wcscpy_s(jobDescriptor.uavNames[3], pipeline->uavResourceBindings[3].name);
+    wcscpy(jobDescriptor.uavNames[0], pipeline->uavResourceBindings[0].name);
+    wcscpy(jobDescriptor.uavNames[1], pipeline->uavResourceBindings[1].name);
+    wcscpy(jobDescriptor.uavNames[2], pipeline->uavResourceBindings[2].name);
+    wcscpy(jobDescriptor.uavNames[3], pipeline->uavResourceBindings[3].name);
 
     jobDescriptor.dimensions[0] = dispatchSrcX;
     jobDescriptor.dimensions[1] = dispatchSrcY;
@@ -1340,11 +1337,11 @@ static FfxErrorCode generateReactiveMaskInternal(FfxFsr2Context_Private* context
         const uint32_t currentResourceId = pipeline->srvResourceBindings[currentShaderResourceViewIndex].resourceIdentifier;
         const FfxResourceInternal currentResource = contextPrivate->srvResources[currentResourceId];
         jobDescriptor.srvs[currentShaderResourceViewIndex] = currentResource;
-        wcscpy_s(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
+        wcscpy(jobDescriptor.srvNames[currentShaderResourceViewIndex], pipeline->srvResourceBindings[currentShaderResourceViewIndex].name);
     }
 
     for (uint32_t currentRootConstantIndex = 0; currentRootConstantIndex < pipeline->constCount; ++currentRootConstantIndex) {
-        wcscpy_s(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->cbResourceBindings[currentRootConstantIndex].name);
+        wcscpy(jobDescriptor.cbNames[currentRootConstantIndex], pipeline->cbResourceBindings[currentRootConstantIndex].name);
         jobDescriptor.cbs[currentRootConstantIndex] = globalFsr2ConstantBuffers[pipeline->cbResourceBindings[currentRootConstantIndex].resourceIdentifier];
         jobDescriptor.cbSlotIndex[currentRootConstantIndex] = pipeline->cbResourceBindings[currentRootConstantIndex].slotIndex;
     }

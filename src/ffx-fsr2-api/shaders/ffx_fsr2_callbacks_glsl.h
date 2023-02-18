@@ -241,10 +241,10 @@ layout (set = 0, binding = 1) uniform sampler s_LinearClamp;
 	layout (set = 1, binding = FSR2_BIND_UAV_DILATED_DEPTH, r16f)                     writeonly uniform image2D  rw_dilatedDepth;
 #endif
 #if defined FSR2_BIND_UAV_INTERNAL_UPSCALED
-	layout (set = 1, binding = FSR2_BIND_UAV_INTERNAL_UPSCALED)                       writeonly uniform image2D  rw_internal_upscaled_color;
+	layout (set = 1, binding = FSR2_BIND_UAV_INTERNAL_UPSCALED, rgba16f)              writeonly uniform image2D  rw_internal_upscaled_color;
 #endif
 #if defined FSR2_BIND_UAV_LOCK_STATUS
-	layout (set = 1, binding = FSR2_BIND_UAV_LOCK_STATUS, r11f_g11f_b10f)             uniform image2D    rw_lock_status;
+	layout (set = 1, binding = FSR2_BIND_UAV_LOCK_STATUS, rg16f)                      uniform image2D    rw_lock_status;
 #endif
 #if defined(FSR2_BIND_UAV_LOCK_INPUT_LUMA)
 	layout(set = 1, binding = FSR2_BIND_UAV_LOCK_INPUT_LUMA, r16f)                    writeonly uniform image2D    rw_lock_input_luma;

@@ -136,6 +136,8 @@ static VkFormat getVKFormatFromSurfaceFormat(FfxSurfaceFormat fmt)
 		return VK_FORMAT_R8G8_UNORM;
 	case FFX_SURFACE_FORMAT_R32_FLOAT:
 		return VK_FORMAT_R32_SFLOAT;
+	case FFX_SURFACE_FORMAT_R8_UINT:
+		return VK_FORMAT_R8_UINT;
 	default:
 		return VK_FORMAT_UNDEFINED;
 	}
