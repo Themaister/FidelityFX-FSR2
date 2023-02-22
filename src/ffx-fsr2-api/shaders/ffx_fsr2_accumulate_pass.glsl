@@ -35,22 +35,20 @@
 #endif
 #define FSR2_BIND_SRV_INTERNAL_UPSCALED                      3
 #define FSR2_BIND_SRV_LOCK_STATUS                            4
-#define FSR2_BIND_SRV_INPUT_DEPTH_CLIP                       5
-#define FSR2_BIND_SRV_PREPARED_INPUT_COLOR                   6
-#define FSR2_BIND_SRV_LUMA_INSTABILITY                       7
-#define FSR2_BIND_SRV_LANCZOS_LUT                            8
-#define FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT               9
-#define FSR2_BIND_SRV_SCENE_LUMINANCE_MIPS                   10
-#define FSR2_BIND_SRV_AUTO_EXPOSURE                          11
-#define FSR2_BIND_SRV_LUMA_HISTORY                           12
+#define FSR2_BIND_SRV_PREPARED_INPUT_COLOR                   5
+#define FSR2_BIND_SRV_LANCZOS_LUT                            6
+#define FSR2_BIND_SRV_UPSCALE_MAXIMUM_BIAS_LUT               7
+#define FSR2_BIND_SRV_SCENE_LUMINANCE_MIPS                   8
+#define FSR2_BIND_SRV_AUTO_EXPOSURE                          9
+#define FSR2_BIND_SRV_LUMA_HISTORY                           10
 
-#define FSR2_BIND_UAV_INTERNAL_UPSCALED                      13
-#define FSR2_BIND_UAV_LOCK_STATUS                            14
-#define FSR2_BIND_UAV_UPSCALED_OUTPUT                        15
-#define FSR2_BIND_UAV_NEW_LOCKS                              16
-#define FSR2_BIND_UAV_LUMA_HISTORY                           17
+#define FSR2_BIND_UAV_INTERNAL_UPSCALED                      11
+#define FSR2_BIND_UAV_LOCK_STATUS                            12
+#define FSR2_BIND_UAV_UPSCALED_OUTPUT                        13
+#define FSR2_BIND_UAV_NEW_LOCKS                              14
+#define FSR2_BIND_UAV_LUMA_HISTORY                           15
 
-#define FSR2_BIND_CB_FSR2                                    18
+#define FSR2_BIND_CB_FSR2                                    16
 
 #include "ffx_fsr2_callbacks_glsl.h"
 #include "ffx_fsr2_common.h"

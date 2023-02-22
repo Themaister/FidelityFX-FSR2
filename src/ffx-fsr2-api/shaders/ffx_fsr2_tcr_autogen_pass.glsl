@@ -37,7 +37,7 @@
 #define FSR2_BIND_UAV_PREV_PRE_ALPHA_COLOR                  9
 #define FSR2_BIND_UAV_PREV_POST_ALPHA_COLOR                 10
 
-#define FSR2_BIND_CB_FSR2									11
+#define FSR2_BIND_CB_FSR2                                   11
 #define FSR2_BIND_CB_REACTIVE                               12
 
 #include "ffx_fsr2_callbacks_glsl.h"

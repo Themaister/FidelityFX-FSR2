@@ -27,8 +27,9 @@
 #define FSR2_BIND_SRV_INPUT_OPAQUE_ONLY                     0
 #define FSR2_BIND_SRV_INPUT_COLOR                           1
 #define FSR2_BIND_UAV_AUTOREACTIVE                          2
-#define FSR2_BIND_CB_REACTIVE                               3
-#define FSR2_BIND_CB_FSR2                                   4
+#define FSR2_BIND_CB_FSR2                                   3
+#define FSR2_BIND_CB_REACTIVE                               4
+
 
 #include "ffx_fsr2_callbacks_glsl.h"
 #include "ffx_fsr2_common.h"

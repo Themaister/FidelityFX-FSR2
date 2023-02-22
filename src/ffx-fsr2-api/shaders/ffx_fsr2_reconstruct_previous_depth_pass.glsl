@@ -28,17 +28,13 @@
 #define FSR2_BIND_SRV_INPUT_DEPTH                           1
 #define FSR2_BIND_SRV_INPUT_COLOR                           2
 #define FSR2_BIND_SRV_INPUT_EXPOSURE                        3
-#define FSR2_BIND_SRV_LUMA_HISTORY                          4
 
-#define FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH      5
-#define FSR2_BIND_UAV_DILATED_MOTION_VECTORS                6
-#define FSR2_BIND_UAV_DILATED_DEPTH                         7
-#define FSR2_BIND_UAV_PREPARED_INPUT_COLOR                  8
-#define FSR2_BIND_UAV_LUMA_HISTORY                          9
-#define FSR2_BIND_UAV_LUMA_INSTABILITY                      10
-#define FSR2_BIND_UAV_LOCK_INPUT_LUMA                       11
+#define FSR2_BIND_UAV_RECONSTRUCTED_PREV_NEAREST_DEPTH      4
+#define FSR2_BIND_UAV_DILATED_MOTION_VECTORS                5
+#define FSR2_BIND_UAV_DILATED_DEPTH                         6
+#define FSR2_BIND_UAV_LOCK_INPUT_LUMA                       7
 
-#define FSR2_BIND_CB_FSR2                                   12
+#define FSR2_BIND_CB_FSR2                                   8
 
 #include "ffx_fsr2_callbacks_glsl.h"
 #include "ffx_fsr2_common.h"
