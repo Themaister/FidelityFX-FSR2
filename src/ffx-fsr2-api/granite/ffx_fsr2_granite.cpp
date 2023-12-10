@@ -553,22 +553,22 @@ FfxErrorCode Granite::FSR2::GetDeviceCapabilities(FfxFsr2Interface *,
 
 	// no shader model in vulkan so assume the minimum
 	deviceCapabilities->raytracingSupported = false;
-	deviceCapabilities->fp16Supported = features.float16_int8_features.shaderFloat16 &&
-	                                    features.storage_16bit_features.storageBuffer16BitAccess;
+	deviceCapabilities->fp16Supported = features.vk12_features.shaderFloat16 &&
+	                                    features.vk11_features.storageBuffer16BitAccess;
 
-	if (features.subgroup_size_control_features.subgroupSizeControl)
+	if (features.vk13_features.subgroupSizeControl)
 	{
-		deviceCapabilities->waveLaneCountMin = features.subgroup_size_control_properties.minSubgroupSize;
-		deviceCapabilities->waveLaneCountMax = features.subgroup_size_control_properties.maxSubgroupSize;
+		deviceCapabilities->waveLaneCountMin = features.vk13_props.minSubgroupSize;
+		deviceCapabilities->waveLaneCountMax = features.vk13_props.maxSubgroupSize;
 	}
 	else
 	{
-		deviceCapabilities->waveLaneCountMin = features.subgroup_properties.subgroupSize;
-		deviceCapabilities->waveLaneCountMax = features.subgroup_properties.subgroupSize;
+		deviceCapabilities->waveLaneCountMin = features.vk11_props.subgroupSize;
+		deviceCapabilities->waveLaneCountMax = features.vk11_props.subgroupSize;
 	}
 
-	if (features.subgroup_size_control_features.computeFullSubgroups &&
-	    (features.subgroup_size_control_properties.requiredSubgroupSizeStages & VK_SHADER_STAGE_COMPUTE_BIT) != 0 &&
+	if (features.vk13_features.computeFullSubgroups &&
+	    (features.vk13_props.requiredSubgroupSizeStages & VK_SHADER_STAGE_COMPUTE_BIT) != 0 &&
 	    deviceCapabilities->fp16Supported)
 	{
 		deviceCapabilities->minimumSupportedShaderModel = FFX_SHADER_MODEL_6_6;
@@ -577,8 +577,8 @@ FfxErrorCode Granite::FSR2::GetDeviceCapabilities(FfxFsr2Interface *,
 	{
 		deviceCapabilities->minimumSupportedShaderModel = FFX_SHADER_MODEL_6_2;
 	}
-	else if (features.subgroup_properties.subgroupSize >= 4 &&
-	         (features.subgroup_properties.supportedStages & VK_SHADER_STAGE_COMPUTE_BIT))
+	else if (features.vk11_props.subgroupSize >= 4 &&
+	         (features.vk11_props.subgroupSupportedStages & VK_SHADER_STAGE_COMPUTE_BIT))
 	{
 		deviceCapabilities->minimumSupportedShaderModel = FFX_SHADER_MODEL_6_0;
 	}
@@ -622,12 +622,12 @@ FfxErrorCode Granite::FSR2::CreatePipeline(FfxFsr2Interface *backendInterface, F
 	bool useLut = canForceWave64;
 
 	// check if we have 16bit floating point.
-	bool supportedFP16 = device->get_device_features().float16_int8_features.shaderFloat16;
+	bool supportedFP16 = device->get_device_features().vk12_features.shaderFloat16;
 
 	if (pass == FFX_FSR2_PASS_ACCUMULATE || pass == FFX_FSR2_PASS_ACCUMULATE_SHARPEN)
 	{
 		// Workaround: Disable FP16 path for the accumulate pass on NVIDIA due to reduced occupancy and high VRAM throughput.
-		if (device->get_device_features().driver_properties.driverID == VK_DRIVER_ID_NVIDIA_PROPRIETARY)
+		if (device->get_device_features().vk12_props.driverID == VK_DRIVER_ID_NVIDIA_PROPRIETARY)
 			supportedFP16 = false;
 	}
 
