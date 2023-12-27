@@ -426,7 +426,7 @@ FfxErrorCode Granite::FSR2::CreateResource(
 			res.undefined = false;
 			res.state = FFX_RESOURCE_STATE_COMPUTE_READ;
 			info.misc =
-			    Vulkan::IMAGE_MISC_CONCURRENT_QUEUE_ASYNC_GRAPHICS_BIT |
+			    Vulkan::IMAGE_MISC_CONCURRENT_QUEUE_GRAPHICS_BIT |
 			    Vulkan::IMAGE_MISC_CONCURRENT_QUEUE_ASYNC_COMPUTE_BIT;
 		}
 
